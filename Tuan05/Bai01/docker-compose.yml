@@ -1,0 +1,7 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: bai01-nginx
+    ports:
+      - "8080:80"
+    restart: unless-stopped

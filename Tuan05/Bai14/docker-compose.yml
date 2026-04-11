@@ -1,0 +1,20 @@
+services:
+  whoami:
+    image: traefik/whoami:latest
+    container_name: bai14-whoami
+    networks:
+      - private_net
+
+  tester:
+    image: curlimages/curl:8.7.1
+    container_name: bai14-tester
+    command: ["sh", "-c", "while true; do curl -s http://whoami; sleep 5; done"]
+    depends_on:
+      - whoami
+    networks:
+      - private_net
+
+networks:
+  private_net:
+    driver: bridge
+    internal: true
