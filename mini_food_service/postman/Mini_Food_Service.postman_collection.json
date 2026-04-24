@@ -1,0 +1,368 @@
+{
+  "info": {
+    "_postman_id": "9a6a2f4c-b8f7-4f75-bbce-2dc46f2f82ea",
+    "name": "Mini Food Service - API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run requests in order from 01 to 12."
+  },
+  "item": [
+    {
+      "name": "01 - Get All Foods - 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/foods"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('Standard success response', function () {",
+              "  pm.expect(body.success).to.eql(true);",
+              "  pm.expect(body.code).to.eql(200);",
+              "  pm.expect(body).to.have.property('timestamp');",
+              "  pm.expect(body).to.have.property('data');",
+              "  pm.expect(Array.isArray(body.data)).to.eql(true);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Get Food By Id - 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/foods/101"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('Food detail response valid', function () {",
+              "  pm.expect(body.success).to.eql(true);",
+              "  pm.expect(body.code).to.eql(200);",
+              "  pm.expect(body.data).to.be.an('object');",
+              "  pm.expect(body.data.id).to.eql(101);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Get Food Not Found - 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/foods/{{missingFoodId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const body = pm.response.json();",
+              "pm.test('Not found format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(404);",
+              "  pm.expect(body).to.have.property('message');",
+              "  pm.expect(body.data).to.be.oneOf([null, undefined]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Simulate Service Down - 503",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/foods/101?simulateServiceDown=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 503', function () { pm.response.to.have.status(503); });",
+              "const body = pm.response.json();",
+              "pm.test('503 format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(503);",
+              "  pm.expect(body).to.have.property('message');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Create Food Unauthorized - 401",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-ROLE", "value": "USER" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Unauthorized Food\",\n  \"price\": 39000,\n  \"description\": \"Should fail because not ADMIN\",\n  \"image\": \"img_url\"\n}"
+        },
+        "url": "{{baseUrl}}/api/foods"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 401', function () { pm.response.to.have.status(401); });",
+              "const body = pm.response.json();",
+              "pm.test('401 format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Create Food Validation Error - 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-ROLE", "value": "{{adminRole}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"price\": 0,\n  \"description\": \"\",\n  \"image\": \"\"\n}"
+        },
+        "url": "{{baseUrl}}/api/foods"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('Validation error format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(400);",
+              "  pm.expect(body.message).to.eql('Validation Error');",
+              "  pm.expect(Array.isArray(body.errors)).to.eql(true);",
+              "  pm.expect(body.errors.length).to.be.above(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Create Food Success - 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-ROLE", "value": "{{adminRole}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Test Food\",\n  \"price\": 57000,\n  \"description\": \"Created by Postman runner\",\n  \"image\": \"postman_img\"\n}"
+        },
+        "url": "{{baseUrl}}/api/foods"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const body = pm.response.json();",
+              "pm.test('Create success format valid', function () {",
+              "  pm.expect(body.success).to.eql(true);",
+              "  pm.expect(body.code).to.eql(201);",
+              "  pm.expect(body.data).to.be.an('object');",
+              "  pm.expect(body.data.id).to.be.a('number');",
+              "});",
+              "pm.collectionVariables.set('createdFoodId', String(body.data.id));",
+              "pm.collectionVariables.set('createdFoodName', body.data.name);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Create Duplicate Name - 422",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-ROLE", "value": "{{adminRole}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"{{createdFoodName}}\",\n  \"price\": 65000,\n  \"description\": \"Duplicate should fail\",\n  \"image\": \"dup_img\"\n}"
+        },
+        "url": "{{baseUrl}}/api/foods"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 422', function () { pm.response.to.have.status(422); });",
+              "const body = pm.response.json();",
+              "pm.test('Business error format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(422);",
+              "  pm.expect(body).to.have.property('message');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Update Food Unauthorized - 401",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-ROLE", "value": "USER" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Unauthorized\",\n  \"price\": 60000,\n  \"description\": \"Should fail\",\n  \"image\": \"img\"\n}"
+        },
+        "url": "{{baseUrl}}/api/foods/{{createdFoodId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 401', function () { pm.response.to.have.status(401); });",
+              "const body = pm.response.json();",
+              "pm.test('401 format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Update Food Success - 200",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-ROLE", "value": "{{adminRole}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Updated Food\",\n  \"price\": 61000,\n  \"description\": \"Updated by Postman runner\",\n  \"image\": \"postman_updated_img\"\n}"
+        },
+        "url": "{{baseUrl}}/api/foods/{{createdFoodId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('Update success format valid', function () {",
+              "  pm.expect(body.success).to.eql(true);",
+              "  pm.expect(body.code).to.eql(200);",
+              "  pm.expect(body.data).to.be.an('object');",
+              "  pm.expect(String(body.data.id)).to.eql(pm.collectionVariables.get('createdFoodId'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Delete Food Success - 200",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "X-ROLE", "value": "{{adminRole}}" }
+        ],
+        "url": "{{baseUrl}}/api/foods/{{createdFoodId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('Delete success format valid', function () {",
+              "  pm.expect(body.success).to.eql(true);",
+              "  pm.expect(body.code).to.eql(200);",
+              "});",
+              "pm.collectionVariables.set('deletedFoodId', pm.collectionVariables.get('createdFoodId'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Delete Food Not Found - 404",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "X-ROLE", "value": "{{adminRole}}" }
+        ],
+        "url": "{{baseUrl}}/api/foods/{{deletedFoodId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const body = pm.response.json();",
+              "pm.test('404 format valid', function () {",
+              "  pm.expect(body.success).to.eql(false);",
+              "  pm.expect(body.code).to.eql(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "createdFoodId", "value": "" },
+    { "key": "createdFoodName", "value": "" },
+    { "key": "deletedFoodId", "value": "" }
+  ]
+}
