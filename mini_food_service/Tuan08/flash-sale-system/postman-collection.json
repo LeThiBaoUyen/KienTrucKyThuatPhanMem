@@ -1,0 +1,285 @@
+{
+  "info": {
+    "name": "Flash Sale System API",
+    "description": "Load testing and integration tests for Space-Based Flash Sale Architecture",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Initialization",
+      "item": [
+        {
+          "name": "Init Products",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/products/init",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "products", "init"]
+            }
+          }
+        },
+        {
+          "name": "Init Stock",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8084/api/stock/init",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8084",
+              "path": ["api", "stock", "init"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PU1 - Product Service",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/products/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Product Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/products/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "products", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PU2 - Cart Service",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/cart/user-123",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "cart", "user-123"]
+            }
+          }
+        },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"userId\\\": \\\"user-123\\\",\\n  \\\"productId\\\": 1,\\n  \\\"productName\\\": \\\"iPhone 15 Pro\\\",\\n  \\\"price\\\": 1299.99,\\n  \\\"quantity\\\": 1\\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/cart/add",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "cart", "add"]
+            }
+          }
+        },
+        {
+          "name": "Get Cart Total",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/cart/user-123/total",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "cart", "user-123", "total"]
+            }
+          }
+        },
+        {
+          "name": "Cart Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/cart/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "cart", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PU3 - Order Service",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"userId\\\": \\\"user-123\\\",\\n  \\\"shippingAddress\\\": \\\"123 Main St\\\",\\n  \\\"phoneNumber\\\": \\\"0123456789\\\"\\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/orders/checkout",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "orders", "checkout"]
+            }
+          }
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/orders/user/user-123",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "orders", "user", "user-123"]
+            }
+          }
+        },
+        {
+          "name": "Order Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/orders/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "orders", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PU4 - Inventory Service",
+      "item": [
+        {
+          "name": "Get Stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8084/api/stock/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8084",
+              "path": ["api", "stock", "1"]
+            }
+          }
+        },
+        {
+          "name": "Reduce Stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"productId\\\": 1,\\n  \\\"quantity\\\": 5\\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8084/api/stock/reduce",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8084",
+              "path": ["api", "stock", "reduce"]
+            }
+          }
+        },
+        {
+          "name": "Inventory Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8084/api/stock/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8084",
+              "path": ["api", "stock", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Load Test - Get Products 100x",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/products",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "products"]
+        }
+      }
+    }
+  ]
+}

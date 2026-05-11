@@ -1,0 +1,108 @@
+# Tệp BUILD-COMMANDS.txt
+# Các lệnh build và run hệ thống Flash Sale
+
+## 1. KHỞI ĐỘNG REDIS DATA GRID
+```
+docker-compose up -d redis
+```
+
+## 2. BUILD VÀ RUN COMMON LIBRARY
+```
+cd common
+mvn clean package
+cd ..
+```
+
+## 3. BUILD VÀ RUN CÁC PROCESSING UNITS
+
+### Terminal 1 - PU1 (Product Service - Port 8081)
+```
+cd pu1-product-service
+mvn clean package
+java -jar target/pu1-product-service.jar
+```
+
+### Terminal 2 - PU2 (Cart Service - Port 8082)
+```
+cd pu2-cart-service
+mvn clean package
+java -jar target/pu2-cart-service.jar
+```
+
+### Terminal 3 - PU3 (Order Service - Port 8083)
+```
+cd pu3-order-service
+mvn clean package
+java -jar target/pu3-order-service.jar
+```
+
+### Terminal 4 - PU4 (Inventory Service - Port 8084)
+```
+cd pu4-inventory-service
+mvn clean package
+java -jar target/pu4-inventory-service.jar
+```
+
+### Terminal 5 - Frontend (React - Port 3000)
+```
+cd frontend
+npm install
+npm start
+```
+
+## 4. KIỂM TRA HEALTH
+
+```
+curl http://localhost:8081/api/products/health
+curl http://localhost:8082/api/cart/health
+curl http://localhost:8083/api/orders/health
+curl http://localhost:8084/api/stock/health
+```
+
+## 5. QUICK START (Tất cả cùng lúc)
+
+Mở 5 terminal hoặc command prompt, chạy lần lượt:
+
+Terminal 1: docker-compose up -d redis && timeout /t 5
+Terminal 2: cd pu1-product-service && mvn clean package && java -jar target/pu1-product-service.jar
+Terminal 3: cd pu2-cart-service && mvn clean package && java -jar target/pu2-cart-service.jar
+Terminal 4: cd pu3-order-service && mvn clean package && java -jar target/pu3-order-service.jar
+Terminal 5: cd pu4-inventory-service && mvn clean package && java -jar target/pu4-inventory-service.jar
+Terminal 6: cd frontend && npm install && npm start
+
+## 6. REDIS CLI COMMANDS
+
+```
+redis-cli ping                  # Kiểm tra Redis
+redis-cli KEYS *               # Xem tất cả keys
+redis-cli GET product:1        # Xem product
+redis-cli GET cart:user-123    # Xem cart
+redis-cli GET stock:1          # Xem stock
+redis-cli DBSIZE               # Số lượng keys
+redis-cli FLUSHALL             # Xóa tất cả data (cẩn thận!)
+```
+
+## 7. LOAD TEST (Apache Bench)
+
+```
+# Cài đặt: choco install apache-httpd (Windows)
+# hoặc apt install apache2-utils (Linux)
+
+# Test 1000 requests, 100 concurrent
+ab -n 1000 -c 100 http://localhost:8081/api/products
+
+# Kết quả: Requests per second (RPS)
+```
+
+## 8. PORTS
+
+| Service | Port | URL |
+|---------|------|-----|
+| Redis | 6379 | localhost:6379 |
+| PU1 (Product) | 8081 | http://localhost:8081 |
+| PU2 (Cart) | 8082 | http://localhost:8082 |
+| PU3 (Order) | 8083 | http://localhost:8083 |
+| PU4 (Inventory) | 8084 | http://localhost:8084 |
+| Frontend | 3000 | http://localhost:3000 |
+
+Bắt đầu tại Frontend http://localhost:3000 để test toàn bộ hệ thống!
